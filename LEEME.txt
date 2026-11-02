@@ -1,0 +1,6 @@
+1. Instala Android Studio (developer.android.com/studio).
+2. File > Open > elige la carpeta CalendarioCiclo. Espera a que termine Gradle sync.
+3. Build > Build Bundle(s) / APK(s) > Build APK(s).
+4. El APK queda en app/build/outputs/apk/debug/app-debug.apk
+5. Pasalo a tu telefono e instalalo (permite instalar apps desconocidas).
+Los datos se guardan en cada telefono (sin sincronizacion entre ustedes).

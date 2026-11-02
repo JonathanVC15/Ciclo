@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nuestro ciclo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#f5f2f9;--surf:#fff;--ink:#2a2340;--mute:#6f6788;--line:#e4dff0;--per:#c0295f;--perbg:#fbe3ec;--fer:#1f8f83;--ferbg:#dcf2ee;--ovu:#e0a020;--pred:#d9a6bc;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1626;--surf:#262036;--ink:#f1ecfa;--mute:#a59cc0;--line:#3a3150;--perbg:#4a2236;--ferbg:#17403c;--pred:#7d4a64}}
+:root[data-theme="dark"]{--bg:#1a1626;--surf:#262036;--ink:#f1ecfa;--mute:#a59cc0;--line:#3a3150;--perbg:#4a2236;--ferbg:#17403c;--pred:#7d4a64}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "DM Sans",system-ui,sans-serif}
+main{max-width:520px;margin:0 auto;padding:18px 16px 40px}
+h1,h2{font-family:Fraunces,Georgia,serif;margin:0}
+h1{font-size:28px}
+.sub{color:var(--mute);font-size:14px;margin:2px 0 16px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+.phase{font-family:Fraunces,Georgia,serif;font-size:26px;line-height:1.15}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.tip{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:15px}
+.tip b{display:block;font-size:13px;color:var(--mute);font-weight:500;margin-bottom:2px}
+.row{display:flex;gap:10px}
+.row>div{flex:1}
+.big{font-family:Fraunces,Georgia,serif;font-size:22px}
+.lbl{font-size:13px;color:var(--mute)}
+.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+button{font:inherit;color:inherit;cursor:pointer}
+.nav{background:none;border:1px solid var(--line);border-radius:10px;width:38px;height:38px;font-size:18px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow{text-align:center;font-size:12px;color:var(--mute);padding-bottom:4px}
+.day{aspect-ratio:1;border:2px solid transparent;border-radius:12px;background:none;font-size:15px;position:relative;padding:0}
+.day.per{background:var(--perbg);color:var(--per);font-weight:700}
+.day.pred{border:2px dashed var(--pred)}
+.day.fer{background:var(--ferbg);color:var(--fer)}
+.day.ovu{background:var(--ovu);color:#2a2340;font-weight:700}
+.day.today{border-color:var(--ink)}
+.day.sel{outline:2px solid var(--ink);outline-offset:1px}
+.day .n{position:absolute;bottom:4px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--mute)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--mute);margin-top:12px}
+.btn{width:100%;border:0;border-radius:12px;padding:12px;font-weight:700;background:var(--per);color:#fff;margin-top:8px}
+.btn.alt{background:none;color:var(--ink);border:1px solid var(--line)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{border:1px solid var(--line);background:none;border-radius:999px;padding:6px 12px;font-size:14px}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+textarea,input{font:inherit;width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--bg);color:var(--ink)}
+textarea{min-height:64px;resize:vertical}
+label{display:block;font-size:14px;color:var(--mute);margin-top:8px}
+.status{font-size:12px;color:var(--mute);text-align:center;margin-top:6px}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Nuestro ciclo</h1>
+  <p class="sub" id="sub">Calendario compartido de periodo</p>
+
+  <section class="card" id="today"></section>
+
+  <section class="card">
+    <div class="head">
+      <button class="nav" id="prev" aria-label="Mes anterior">‹</button>
+      <h2 id="month"></h2>
+      <button class="nav" id="next" aria-label="Mes siguiente">›</button>
+    </div>
+    <div class="grid" id="dows"></div>
+    <div class="grid" id="days"></div>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--per)"></i>Periodo</span>
+      <span><i class="dot" style="border:2px dashed var(--pred)"></i>Previsto</span>
+      <span><i class="dot" style="background:var(--fer)"></i>Días fértiles</span>
+      <span><i class="dot" style="background:var(--ovu)"></i>Ovulación</span>
+    </div>
+  </section>
+
+  <section class="card" id="detail" hidden></section>
+
+  <section class="card">
+    <h2 style="font-size:20px">Ajustes</h2>
+    <label for="cl">Duración del ciclo (días)</label>
+    <input id="cl" type="number" min="20" max="45">
+    <label for="pl">Duración del periodo (días)</label>
+    <input id="pl" type="number" min="2" max="10">
+    <p class="lbl" style="margin:8px 0 0">Con 2 o más periodos registrados, el ciclo se calcula solo.</p>
+  </section>
+  <div class="status" id="status"></div>
+</main>
+
+<script>
+const MESES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const DOW=["L","M","X","J","V","S","D"];
+const SINT=["Cólicos","Dolor de cabeza","Cansancio","Hinchazón","Antojos","Sensible","Irritable","Buen ánimo","Mucha energía"];
+const TIPS={
+ per:["Menstruación","Ofrece compresas calientes, té o su snack favorito. Pregunta qué necesita, sin asumir.","Puede haber cólicos y cansancio. Ayuda con tareas y baja las exigencias."],
+ fol:["Fase folicular","Suele subir la energía. Buen momento para planes, salidas y cosas nuevas.","La energía y el ánimo suelen mejorar."],
+ fer:["Días fértiles","Si buscan embarazo, son los mejores días. Si no, usen protección.","La probabilidad de embarazo es alta estos días."],
+ lut:["Fase lútea","Pueden aparecer sensibilidad, antojos o cansancio. Más paciencia y cariño.","Puede haber síntomas premenstruales. Escucha sin minimizar."]
+};
+const pad=n=>String(n).padStart(2,"0");
+const key=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parse=k=>{const[a,b,c]=k.split("-").map(Number);return new Date(a,b-1,c)};
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const diff=(a,b)=>Math.round((a-b)/864e5);
+const today=new Date(new Date().setHours(0,0,0,0));
+
+let S={period:[],cycleLen:28,periodLen:5,notes:{}};
+let view=new Date(today.getFullYear(),today.getMonth(),1);
+let sel=null,ref=null,saveT=null,mode="local";
+
+// ---- Data
+function starts(){
+  const set=new Set(S.period);
+  return [...set].sort().filter(k=>!set.has(key(addD(parse(k),-1)))).map(parse);
+}
+function avgCycle(){
+  const st=starts();
+  if(st.length<2)return S.cycleLen;
+  const ds=[];for(let i=1;i<st.length;i++)ds.push(diff(st[i],st[i-1]));
+  const last=ds.slice(-6).filter(x=>x>=18&&x<=60);
+  return last.length?Math.round(last.reduce((a,b)=>a+b,0)/last.length):S.cycleLen;
+}
+function calc(){
+  const st=starts(),cl=avgCycle(),pl=S.periodLen;
+  const info={cl,pred:new Set(),fer:new Set(),ovu:new Set(),next:null,last:st[st.length-1]||null};
+  if(!info.last)return info;
+  for(let i=0;i<=12;i++){
+    const s=addD(info.last,cl*i);
+    if(i>0){
+      if(!info.next&&s>=today)info.next=s;
+      for(let j=0;j<pl;j++)info.pred.add(key(addD(s,j)));
+    }
+    const o=addD(s,cl-14);
+    // ovulación del ciclo que empieza en s
+    const o2=addD(s,cl-14);
+    info.ovu.add(key(o2));
+    for(let j=-5;j<=1;j++)info.fer.add(key(addD(o2,j)));
+  }
+  if(!info.next)info.next=addD(info.last,cl);
+  return info;
+}
+function phase(info){
+  if(!info.last)return null;
+  const d=diff(today,info.last);
+  if(d<0)return null;
+  const c=d%info.cl,ov=info.cl-14;
+  const inPeriod=S.period.includes(key(today))||(d<info.cl&&c<S.periodLen);
+  if(inPeriod)return{k:"per",day:c+1};
+  if(c>=ov-5&&c<=ov+1)return{k:"fer",day:c+1};
+  if(c<ov-5)return{k:"fol",day:c+1};
+  return{k:"lut",day:c+1};
+}
+
+// ---- Render
+function render(){
+  const info=calc(),ph=phase(info);
+  const colors={per:"var(--per)",fol:"var(--ink)",fer:"var(--fer)",lut:"var(--mute)"};
+  const t=document.getElementById("today");
+  if(!ph){
+    t.innerHTML='<div class="phase">Empieza aquí</div><div class="tip">Toca el primer día de su último periodo en el calendario para marcarlo. Después aparecerán las predicciones.</div>';
+  }else{
+    const [name,partner,her]=TIPS[ph.k];
+    const nx=info.next,dn=diff(nx,today);
+    t.innerHTML=`<div class="lbl">Hoy · día ${ph.day} del ciclo</div>
+      <div class="phase"><i class="dot" style="background:${colors[ph.k]}"></i>${name}</div>
+      <div class="row" style="margin-top:12px">
+        <div><div class="lbl">Próximo periodo</div><div class="big">${dn<=0?"hoy":dn===1?"mañana":"en "+dn+" días"}</div><div class="lbl">${nx.getDate()} ${MESES[nx.getMonth()].toLowerCase()}</div></div>
+        <div><div class="lbl">Ciclo promedio</div><div class="big">${info.cl} días</div></div>
+      </div>
+      <div class="tip"><b>Para ti</b>${her}</div>
+      <div class="tip"><b>Para tu pareja</b>${partner}</div>`;
+  }
+  document.getElementById("month").textContent=MESES[view.getMonth()]+" "+view.getFullYear();
+  const days=document.getElementById("days");days.innerHTML="";
+  const first=new Date(view.getFullYear(),view.getMonth(),1);
+  const off=(first.getDay()+6)%7;
+  const dim=new Date(view.getFullYear(),view.getMonth()+1,0).getDate();
+  for(let i=0;i<off;i++)days.appendChild(document.createElement("div"));
+  for(let n=1;n<=dim;n++){
+    const d=new Date(view.getFullYear(),view.getMonth(),n),k=key(d);
+    const b=document.createElement("button");
+    b.className="day";b.textContent=n;
+    const isP=S.period.includes(k);
+    if(isP)b.classList.add("per");
+    else if(info.ovu.has(k)&&d>=today)b.classList.add("ovu");
+    else if(info.fer.has(k)&&d>=today)b.classList.add("fer");
+    if(!isP&&info.pred.has(k))b.classList.add("pred");
+    if(k===key(today))b.classList.add("today");
+    if(k===sel)b.classList.add("sel");
+    const nt=S.notes[k];
+    if(nt&&((nt.sym&&nt.sym.length)||nt.text)){const s=document.createElement("span");s.className="n";b.appendChild(s)}
+    b.setAttribute("aria-label",n+" de "+MESES[d.getMonth()]);
+    b.onclick=()=>{sel=k;render()};
+    days.appendChild(b);
+  }
+  renderDetail();
+}
+function renderDetail(){
+  const el=document.getElementById("detail");
+  if(!sel){el.hidden=true;return}
+  el.hidden=false;
+  const d=parse(sel),isP=S.period.includes(sel),nt=S.notes[sel]||{sym:[],text:""};
+  el.innerHTML=`<h2 style="font-size:20px">${d.getDate()} de ${MESES[d.getMonth()].toLowerCase()}</h2>
+    <button class="btn ${isP?"alt":""}" id="tp">${isP?"Quitar día de periodo":"Marcar como día de periodo"}</button>
+    <button class="btn alt" id="tw">Marcar ${S.periodLen} días desde aquí</button>
+    <label>Síntomas y ánimo</label>
+    <div class="chips">${SINT.map(s=>`<button class="chip ${nt.sym&&nt.sym.includes(s)?"on":""}" data-s="${s}">${s}</button>`).join("")}</div>
+    <label for="nt">Nota</label>
+    <textarea id="nt" placeholder="Algo que quieran recordar">${(nt.text||"").replace(/</g,"&lt;")}</textarea>`;
+  document.getElementById("tp").onclick=()=>{toggle(sel);save();render()};
+  document.getElementById("tw").onclick=()=>{
+    for(let i=0;i<S.periodLen;i++){const k=key(addD(d,i));if(!S.period.includes(k))S.period.push(k)}
+    save();render()};
+  el.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
+    const n=S.notes[sel]||(S.notes[sel]={sym:[],text:""});
+    n.sym=n.sym||[];const s=c.dataset.s,i=n.sym.indexOf(s);
+    if(i<0)n.sym.push(s);else n.sym.splice(i,1);
+    save();render()});
+  document.getElementById("nt").oninput=e=>{
+    const n=S.notes[sel]||(S.notes[sel]={sym:[],text:""});
+    n.text=e.target.value;save()};
+}
+function toggle(k){const i=S.period.indexOf(k);if(i<0)S.period.push(k);else S.period.splice(i,1)}
+
+// ---- Persistencia
+function setStatus(t){document.getElementById("status").textContent=t}
+function save(){
+  clearTimeout(saveT);
+  saveT=setTimeout(async()=>{
+    const data=JSON.parse(JSON.stringify(S));
+    if(ref){try{await ref.set(data);setStatus("Guardado y compartido");return}catch(e){}}
+    try{localStorage.setItem("ciclo",JSON.stringify(data));setStatus("Guardado en este dispositivo")}catch(e){setStatus("No se pudo guardar")}
+  },400);
+}
+function load(d){
+  if(!d)return;
+  S=Object.assign({period:[],cycleLen:28,periodLen:5,notes:{}},d);
+  S.period=[...(S.period||[])];S.notes=S.notes||{};
+  document.getElementById("cl").value=S.cycleLen;
+  document.getElementById("pl").value=S.periodLen;
+}
+async function init(){
+  document.getElementById("dows").innerHTML=DOW.map(d=>`<div class="dow">${d}</div>`).join("");
+  document.getElementById("prev").onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()-1,1);render()};
+  document.getElementById("next").onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()+1,1);render()};
+  document.getElementById("cl").value=S.cycleLen;document.getElementById("pl").value=S.periodLen;
+  document.getElementById("cl").onchange=e=>{S.cycleLen=Math.min(45,Math.max(20,+e.target.value||28));save();render()};
+  document.getElementById("pl").onchange=e=>{S.periodLen=Math.min(10,Math.max(2,+e.target.value||5));save();render()};
+  try{const raw=localStorage.getItem("ciclo");if(raw)load(JSON.parse(raw))}catch(e){}
+  render();
+  try{
+    const db=await claude.use("db");
+    if(db){
+      ref=db.doc("data/cycle");
+      mode="shared";
+      ref.onSnapshot(s=>{
+        if(s.exists){load(s.data());render();setStatus("Sincronizado")}
+        else setStatus("Listo para compartir");
+      },()=>{setStatus("Sin conexión compartida")});
+    }else setStatus("Guardado en este dispositivo");
+  }catch(e){setStatus("Guardado en este dispositivo")}
+}
+init();
+</script>
+</body>
+</html>
